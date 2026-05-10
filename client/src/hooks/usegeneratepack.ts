@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { generatePack, exportPack } from "@/services/packs";
+import { generatePack, exportPack, getPack } from "@/services/packs";
 import { PackData } from "@/types";
 
 interface UseGeneratePackReturn {
@@ -9,6 +9,8 @@ interface UseGeneratePackReturn {
   error: string | null;
   generate: (notes: string) => Promise<void>;
   exportPdf: () => Promise<void>;
+  viewPack: (id: string) => Promise<void>;
+  exportFromHistory: (id: string) => Promise<void>;
   updatePackData: (updater: (prev: PackData) => PackData) => void;
   setPackData: (data: PackData | null) => void;
   reset: () => void;
@@ -59,11 +61,43 @@ export function useGeneratePack(): UseGeneratePackReturn {
     setError(null);
   };
 
+  const viewPack = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await getPack(id);
+      setPackData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load pack");
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const exportFromHistory = async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await getPack(id);
+      setPackData(data);
+      setIsLoading(false);
+      setIsExporting(true);
+      await exportPack(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to export PDF");
+      throw err;
+    } finally {
+      setIsExporting(false);
+      setIsLoading(false);
+    }
+  };
+
   const reset = () => {
     setPackData(null);
     setError(null);
     setIsExporting(false);
   };
 
-  return { packData, isLoading, isExporting, error, generate, exportPdf, updatePackData, setPackData: setPack, reset };
+  return { packData, isLoading, isExporting, error, generate, exportPdf, viewPack, exportFromHistory, updatePackData, setPackData: setPack, reset };
 }

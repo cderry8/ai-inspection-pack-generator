@@ -10,7 +10,7 @@ import { useGeneratePack } from "@/hooks/usegeneratepack";
 import { PackData, Risk } from "@/types";
 
 export default function Home() {
-  const { packData, isLoading, isExporting, error, generate, exportPdf, updatePackData, setPackData, reset: resetPack } = useGeneratePack();
+  const { packData, isLoading, isExporting, error, generate, exportPdf, viewPack, exportFromHistory, updatePackData, setPackData, reset: resetPack } = useGeneratePack();
   const [hasGenerated, setHasGenerated] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -53,10 +53,22 @@ export default function Home() {
     setShowHistory(false);
   };
 
-  const handleViewPackFromHistory = (pack: PackData) => {
-    setPackData(pack);
-    setHasGenerated(true);
-    setShowHistory(false);
+  const handleViewPackFromHistory = async (id: string) => {
+    try {
+      await viewPack(id);
+      setHasGenerated(true);
+      setShowHistory(false);
+    } catch {
+      // error already set in hook
+    }
+  };
+
+  const handleExportFromHistory = async (id: string) => {
+    try {
+      await exportFromHistory(id);
+    } catch {
+      // error already set in hook
+    }
   };
 
   return (
@@ -67,7 +79,14 @@ export default function Home() {
           <Header />
           <div className="flex flex-col items-center">
             {showHistory ? (
-              <PackHistory onBack={handleBackFromHistory} onViewPack={handleViewPackFromHistory} />
+              <PackHistory
+                onBack={handleBackFromHistory}
+                onViewPack={handleViewPackFromHistory}
+                onExportPack={handleExportFromHistory}
+                isLoading={isLoading}
+                isExporting={isExporting}
+                error={error}
+              />
             ) : !hasGenerated || !packData ? (
               <InspectionForm onGenerate={handleGenerate} isLoading={isLoading} error={error} onShowHistory={handleShowHistory} />
             ) : (

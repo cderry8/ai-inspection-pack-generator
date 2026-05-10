@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import Card from "@/components/ui/card";
 import Button from "@/components/ui/button";
-import { getPacks, getPack, exportPack } from "@/services/packs";
-import { PackData } from "@/types";
+import { getPacks } from "@/services/packs";
 
 interface Pack {
   id: string;
@@ -19,13 +18,17 @@ interface Pack {
 
 interface PackHistoryProps {
   onBack: () => void;
-  onViewPack: (pack: PackData) => void;
+  onViewPack: (id: string) => Promise<void>;
+  onExportPack: (id: string) => Promise<void>;
+  isLoading: boolean;
+  isExporting: boolean;
+  error: string | null;
 }
 
-export default function PackHistory({ onBack, onViewPack }: PackHistoryProps) {
+export default function PackHistory({ onBack, onViewPack, onExportPack, isLoading, isExporting, error }: PackHistoryProps) {
   const [packs, setPacks] = useState<Pack[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoadingList, setIsLoadingList] = useState(true);
+  const [listError, setListError] = useState<string | null>(null);
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [exportingId, setExportingId] = useState<string | null>(null);
 
@@ -37,9 +40,9 @@ export default function PackHistory({ onBack, onViewPack }: PackHistoryProps) {
         const data = await getPacks();
         if (mounted) setPacks(data);
       } catch (err) {
-        if (mounted) setError(err instanceof Error ? err.message : "Failed to load packs");
+        if (mounted) setListError(err instanceof Error ? err.message : "Failed to load packs");
       } finally {
-        if (mounted) setIsLoading(false);
+        if (mounted) setIsLoadingList(false);
       }
     }
 
@@ -49,12 +52,8 @@ export default function PackHistory({ onBack, onViewPack }: PackHistoryProps) {
 
   const handleView = async (id: string) => {
     setViewingId(id);
-    setError(null);
     try {
-      const pack = await getPack(id);
-      onViewPack(pack);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load pack");
+      await onViewPack(id);
     } finally {
       setViewingId(null);
     }
@@ -62,18 +61,14 @@ export default function PackHistory({ onBack, onViewPack }: PackHistoryProps) {
 
   const handleExport = async (id: string) => {
     setExportingId(id);
-    setError(null);
     try {
-      const pack = await getPack(id);
-      await exportPack(pack);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to export PDF");
+      await onExportPack(id);
     } finally {
       setExportingId(null);
     }
   };
 
-  if (isLoading) {
+  if (isLoadingList) {
     return (
       <div className="w-full max-w-6xl space-y-6">
         <div className="flex items-center justify-between">
@@ -90,7 +85,7 @@ export default function PackHistory({ onBack, onViewPack }: PackHistoryProps) {
     );
   }
 
-  if (error) {
+  if (listError) {
     return (
       <div className="w-full max-w-6xl space-y-6">
         <div className="flex items-center justify-between">
@@ -98,7 +93,7 @@ export default function PackHistory({ onBack, onViewPack }: PackHistoryProps) {
           <Button variant="ghost" onClick={onBack}>Back to Generator</Button>
         </div>
         <div className="p-4 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 text-center">
-          {error}
+          {listError}
         </div>
       </div>
     );
@@ -131,6 +126,12 @@ export default function PackHistory({ onBack, onViewPack }: PackHistoryProps) {
         </div>
         <Button variant="ghost" onClick={onBack}>Back to Generator</Button>
       </div>
+
+      {error && (
+        <div className="p-4 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 text-center">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {packs.map((pack) => (
@@ -175,9 +176,9 @@ export default function PackHistory({ onBack, onViewPack }: PackHistoryProps) {
                   size="sm"
                   className="flex-1"
                   onClick={() => handleView(pack.id)}
-                  disabled={viewingId === pack.id}
+                  disabled={isLoading || isExporting}
                 >
-                  {viewingId === pack.id ? (
+                  {viewingId === pack.id && isLoading ? (
                     <span className="flex items-center gap-1">
                       <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -193,9 +194,9 @@ export default function PackHistory({ onBack, onViewPack }: PackHistoryProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => handleExport(pack.id)}
-                  disabled={exportingId === pack.id}
+                  disabled={isLoading || isExporting}
                 >
-                  {exportingId === pack.id ? (
+                  {exportingId === pack.id && isExporting ? (
                     <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
