@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import InspectionForm from "@/components/input/inspectionform";
-import PackPreview from "@/components/output/packpreview";
+import InspectionForm from "@/components/input/InspectionForm";
+import PackPreview from "@/components/output/PackPreview";
 import PackHistory from "@/components/history/packhistory";
-import Header from "@/components/layout/header";
-import TopLoadingBar from "@/components/loading/toploadingbar";
+import Header from "@/components/layout/Header";
+import TopLoadingBar from "@/components/loading/TopLoadingBar";
 import { useGeneratePack } from "@/hooks/usegeneratepack";
 import { PackData, Risk } from "@/types";
 

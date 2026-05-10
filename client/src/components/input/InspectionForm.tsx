@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@/components/ui/button";
-import TextArea from "@/components/ui/textarea";
-import Card from "@/components/ui/card";
+import Button from "@/components/ui/Button";
+import TextArea from "@/components/ui/TextArea";
+import Card from "@/components/ui/Card";
 
 interface InspectionFormProps {
   onGenerate: (notes: string) => void;

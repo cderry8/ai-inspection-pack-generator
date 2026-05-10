@@ -1,10 +1,10 @@
 "use client";
 
-import Card from "@/components/ui/card";
-import Button from "@/components/ui/button";
-import RiskSummary from "./risksummary";
-import MissingDocs from "./missingdocs";
-import ActionPlan from "./actionplan";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import RiskSummary from "./RiskSummary";
+import MissingDocs from "./MissingDocs";
+import ActionPlan from "./ActionPlan";
 import { PackData } from "@/types";
 
 interface PackPreviewProps {
