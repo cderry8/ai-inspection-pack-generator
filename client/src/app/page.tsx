@@ -9,7 +9,7 @@ import { useGeneratePack } from "@/hooks/usegeneratepack";
 import { PackData, Risk } from "@/types";
 
 export default function Home() {
-  const { packData, isLoading, error, generate, updatePackData, reset: resetPack } = useGeneratePack();
+  const { packData, isLoading, isExporting, error, generate, exportPdf, updatePackData, reset: resetPack } = useGeneratePack();
   const [hasGenerated, setHasGenerated] = useState(false);
 
   const handleGenerate = async (notes: string) => {
@@ -30,7 +30,13 @@ export default function Home() {
     }));
   };
 
-  const handleExportPDF = () => {};
+  const handleExportPDF = async () => {
+    try {
+      await exportPdf();
+    } catch (error) {
+      console.error("Failed to export PDF:", error);
+    }
+  };
 
   const handleReset = () => {
     setHasGenerated(false);
@@ -39,7 +45,7 @@ export default function Home() {
 
   return (
     <>
-      <TopLoadingBar isLoading={isLoading} />
+      <TopLoadingBar isLoading={isLoading || isExporting} />
       <main className="relative z-10 min-h-screen px-4 py-8 md:py-12">
         <div className="max-w-7xl mx-auto">
           <Header />
@@ -49,6 +55,8 @@ export default function Home() {
             ) : (
               <PackPreview
                 data={packData}
+                isExporting={isExporting}
+                error={error}
                 onUpdateRiskConfidence={handleUpdateRiskConfidence}
                 onExportPDF={handleExportPDF}
                 onReset={handleReset}
