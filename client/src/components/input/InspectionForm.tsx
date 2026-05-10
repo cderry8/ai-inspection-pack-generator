@@ -9,6 +9,7 @@ interface InspectionFormProps {
   onGenerate: (notes: string) => void;
   isLoading?: boolean;
   error?: string | null;
+  onShowHistory?: () => void;
 }
 
 const MIN_NOTES_LENGTH = 50;
@@ -17,6 +18,7 @@ export default function InspectionForm({
   onGenerate,
   isLoading = false,
   error = null,
+  onShowHistory,
 }: InspectionFormProps) {
   const [notes, setNotes] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -58,6 +60,18 @@ export default function InspectionForm({
           placeholder="Enter your inspection notes here... Example: Electrical wiring exposed in warehouse section B. Fire suppression system last checked 6 months ago. Missing safety training records for 3 employees..."
           rows={10}
         />
+
+        {onShowHistory && (
+          <button
+            onClick={onShowHistory}
+            className="w-full py-2.5 rounded-lg text-sm font-medium bg-slate-800/40 text-slate-400 border border-slate-700/50 hover:bg-slate-700/40 hover:text-cyan-300 hover:border-cyan-500/20 transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            View Previously Generated Packs
+          </button>
+        )}
 
         {(validationError || error) && (
           <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 text-sm">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import InspectionForm from "@/components/input/inspectionform";
 import PackPreview from "@/components/output/packpreview";
+import PackHistory from "@/components/history/packhistory";
 import Header from "@/components/layout/header";
 import TopLoadingBar from "@/components/loading/toploadingbar";
 import { useGeneratePack } from "@/hooks/usegeneratepack";
@@ -11,6 +12,7 @@ import { PackData, Risk } from "@/types";
 export default function Home() {
   const { packData, isLoading, isExporting, error, generate, exportPdf, updatePackData, reset: resetPack } = useGeneratePack();
   const [hasGenerated, setHasGenerated] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   const handleGenerate = async (notes: string) => {
     try {
@@ -43,6 +45,14 @@ export default function Home() {
     resetPack();
   };
 
+  const handleShowHistory = () => {
+    setShowHistory(true);
+  };
+
+  const handleBackFromHistory = () => {
+    setShowHistory(false);
+  };
+
   return (
     <>
       <TopLoadingBar isLoading={isLoading || isExporting} />
@@ -50,8 +60,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <Header />
           <div className="flex flex-col items-center">
-            {!hasGenerated || !packData ? (
-              <InspectionForm onGenerate={handleGenerate} isLoading={isLoading} error={error} />
+            {showHistory ? (
+              <PackHistory onBack={handleBackFromHistory} />
+            ) : !hasGenerated || !packData ? (
+              <InspectionForm onGenerate={handleGenerate} isLoading={isLoading} error={error} onShowHistory={handleShowHistory} />
             ) : (
               <PackPreview
                 data={packData}
