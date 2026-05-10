@@ -68,6 +68,7 @@ export async function getAllPacks() {
           return {
             id: data.id,
             title: data.title,
+            createdAt: data.createdAt,
             date: new Date(data.createdAt).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -88,7 +89,7 @@ export async function getAllPacks() {
 
     return packs
       .filter(Boolean)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   } catch (err) {
     if (err.code === "ENOENT") {
       return [];
