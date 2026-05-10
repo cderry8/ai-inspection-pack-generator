@@ -10,6 +10,7 @@ interface UseGeneratePackReturn {
   generate: (notes: string) => Promise<void>;
   exportPdf: () => Promise<void>;
   updatePackData: (updater: (prev: PackData) => PackData) => void;
+  setPackData: (data: PackData | null) => void;
   reset: () => void;
 }
 
@@ -53,11 +54,16 @@ export function useGeneratePack(): UseGeneratePackReturn {
     setPackData((prev) => (prev ? updater(prev) : null));
   };
 
+  const setPack = (data: PackData | null) => {
+    setPackData(data);
+    setError(null);
+  };
+
   const reset = () => {
     setPackData(null);
     setError(null);
     setIsExporting(false);
   };
 
-  return { packData, isLoading, isExporting, error, generate, exportPdf, updatePackData, reset };
+  return { packData, isLoading, isExporting, error, generate, exportPdf, updatePackData, setPackData: setPack, reset };
 }

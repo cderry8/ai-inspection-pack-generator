@@ -29,6 +29,11 @@ export async function getPacks(): Promise<HistoryPack[]> {
   return response.data.data;
 }
 
+export async function getPack(id: string): Promise<PackData> {
+  const response = await api.get(`/aipg/packs/${id}`);
+  return response.data.data;
+}
+
 export async function exportPack(packData: PackData): Promise<void> {
   try {
     const response = await api.post("/aipg/packs/export", { packData }, {

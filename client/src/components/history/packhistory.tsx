@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Card from "@/components/ui/card";
 import Button from "@/components/ui/button";
-import { getPacks } from "@/services/packs";
+import { getPacks, getPack, exportPack } from "@/services/packs";
+import { PackData } from "@/types";
 
 interface Pack {
   id: string;
@@ -18,12 +19,15 @@ interface Pack {
 
 interface PackHistoryProps {
   onBack: () => void;
+  onViewPack: (pack: PackData) => void;
 }
 
-export default function PackHistory({ onBack }: PackHistoryProps) {
+export default function PackHistory({ onBack, onViewPack }: PackHistoryProps) {
   const [packs, setPacks] = useState<Pack[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewingId, setViewingId] = useState<string | null>(null);
+  const [exportingId, setExportingId] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -42,6 +46,32 @@ export default function PackHistory({ onBack }: PackHistoryProps) {
     load();
     return () => { mounted = false; };
   }, []);
+
+  const handleView = async (id: string) => {
+    setViewingId(id);
+    setError(null);
+    try {
+      const pack = await getPack(id);
+      onViewPack(pack);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load pack");
+    } finally {
+      setViewingId(null);
+    }
+  };
+
+  const handleExport = async (id: string) => {
+    setExportingId(id);
+    setError(null);
+    try {
+      const pack = await getPack(id);
+      await exportPack(pack);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to export PDF");
+    } finally {
+      setExportingId(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -140,13 +170,41 @@ export default function PackHistory({ onBack }: PackHistoryProps) {
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Button variant="secondary" size="sm" className="flex-1">
-                  View Pack
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => handleView(pack.id)}
+                  disabled={viewingId === pack.id}
+                >
+                  {viewingId === pack.id ? (
+                    <span className="flex items-center gap-1">
+                      <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Loading...
+                    </span>
+                  ) : (
+                    "View Pack"
+                  )}
                 </Button>
-                <Button variant="ghost" size="sm">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleExport(pack.id)}
+                  disabled={exportingId === pack.id}
+                >
+                  {exportingId === pack.id ? (
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  )}
                 </Button>
               </div>
             </div>

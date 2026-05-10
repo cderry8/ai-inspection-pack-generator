@@ -10,7 +10,7 @@ import { useGeneratePack } from "@/hooks/usegeneratepack";
 import { PackData, Risk } from "@/types";
 
 export default function Home() {
-  const { packData, isLoading, isExporting, error, generate, exportPdf, updatePackData, reset: resetPack } = useGeneratePack();
+  const { packData, isLoading, isExporting, error, generate, exportPdf, updatePackData, setPackData, reset: resetPack } = useGeneratePack();
   const [hasGenerated, setHasGenerated] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -53,6 +53,12 @@ export default function Home() {
     setShowHistory(false);
   };
 
+  const handleViewPackFromHistory = (pack: PackData) => {
+    setPackData(pack);
+    setHasGenerated(true);
+    setShowHistory(false);
+  };
+
   return (
     <>
       <TopLoadingBar isLoading={isLoading || isExporting} />
@@ -61,7 +67,7 @@ export default function Home() {
           <Header />
           <div className="flex flex-col items-center">
             {showHistory ? (
-              <PackHistory onBack={handleBackFromHistory} />
+              <PackHistory onBack={handleBackFromHistory} onViewPack={handleViewPackFromHistory} />
             ) : !hasGenerated || !packData ? (
               <InspectionForm onGenerate={handleGenerate} isLoading={isLoading} error={error} onShowHistory={handleShowHistory} />
             ) : (
