@@ -202,8 +202,23 @@ function generateHTML(packData) {
   `;
 }
 
+function resolveChromePath() {
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    return process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+  try {
+    return puppeteer.executablePath();
+  } catch {
+    return undefined;
+  }
+}
+
 export async function generatePDF(packData) {
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: resolveChromePath(),
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
   try {
     const page = await browser.newPage();
     const html = generateHTML(packData);
