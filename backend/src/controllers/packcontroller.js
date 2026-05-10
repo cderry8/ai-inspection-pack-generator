@@ -1,5 +1,6 @@
 import { generateInspectionPack } from "../services/aiagent.js";
 import { generatePDF } from "../services/pdfservice.js";
+import { savePack, getAllPacks, getPackById } from "../services/packstorage.js";
 
 const MIN_NOTES_LENGTH = 50;
 
@@ -44,9 +45,16 @@ export async function createPack(req, res) {
       });
     }
 
+    const savedPack = await savePack(packData);
+
     res.status(200).json({
       success: true,
-      data: packData,
+      data: {
+        ...packData,
+        id: savedPack.id,
+        title: savedPack.title,
+        createdAt: savedPack.createdAt,
+      },
     });
   } catch (error) {
     console.error("Error in createPack:", error);
@@ -76,6 +84,44 @@ export async function exportPDF(req, res) {
     console.error("Error in exportPDF:", error);
     res.status(500).json({
       error: "Failed to generate PDF",
+      message: error.message,
+    });
+  }
+}
+
+export async function getPacks(req, res) {
+  try {
+    const packs = await getAllPacks();
+    res.status(200).json({
+      success: true,
+      data: packs,
+    });
+  } catch (error) {
+    console.error("Error in getPacks:", error);
+    res.status(500).json({
+      error: "Failed to retrieve packs",
+      message: error.message,
+    });
+  }
+}
+
+export async function getPack(req, res) {
+  try {
+    const { id } = req.params;
+    const pack = await getPackById(id);
+    res.status(200).json({
+      success: true,
+      data: pack,
+    });
+  } catch (error) {
+    if (error.message === "Pack not found") {
+      return res.status(404).json({
+        error: "Pack not found",
+      });
+    }
+    console.error("Error in getPack:", error);
+    res.status(500).json({
+      error: "Failed to retrieve pack",
       message: error.message,
     });
   }

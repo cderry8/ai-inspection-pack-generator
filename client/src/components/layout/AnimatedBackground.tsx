@@ -34,7 +34,6 @@ export default function AnimatedBackground() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Futuristic accent colors - cyan and electric purple focus
     const colors = ["#00d4ff", "#a855f7", "#c084fc", "#22d3ee", "#e879f9"];
 
     const particles: SandParticle[] = [];
@@ -52,17 +51,14 @@ export default function AnimatedBackground() {
       color: colors[Math.floor(Math.random() * colors.length)],
     });
 
-    // Initialize particles
     for (let i = 0; i < maxParticles; i++) {
       particles.push(createParticle());
     }
 
     const animate = () => {
-      // Pure black background with subtle vignette
       ctx.fillStyle = "#000000";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Add vignette shadow
       const vignette = ctx.createRadialGradient(
         canvas.width / 2,
         canvas.height / 2,
@@ -76,7 +72,6 @@ export default function AnimatedBackground() {
       ctx.fillStyle = vignette;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw accent glow zones (futuristic feel)
       const glow1 = ctx.createRadialGradient(
         canvas.width * 0.2,
         canvas.height * 0.3,
@@ -103,41 +98,32 @@ export default function AnimatedBackground() {
       ctx.fillStyle = glow2;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Update and draw sand particles
       particles.forEach((p) => {
-        // Move particle
         p.x += p.speedX;
         p.y += p.speedY;
 
-        // Wrap around screen
         if (p.x < 0) p.x = canvas.width;
         if (p.x > canvas.width) p.x = 0;
         if (p.y < 0) p.y = canvas.height;
         if (p.y > canvas.height) p.y = 0;
 
-        // Twinkle effect
         p.twinklePhase += p.twinkleSpeed;
         const twinkle = Math.sin(p.twinklePhase) * 0.5 + 0.5;
         const currentOpacity = p.opacity * twinkle;
 
-        // Draw particle with glow
         ctx.globalAlpha = currentOpacity;
         ctx.fillStyle = p.color;
 
-        // Glow
         ctx.shadowBlur = 10;
         ctx.shadowColor = p.color;
 
-        // Draw sand grain (small circle)
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
 
-        // Reset shadow for performance
         ctx.shadowBlur = 0;
       });
 
-      // Draw connection lines between close particles (futuristic web)
       ctx.globalAlpha = 0.03;
       ctx.strokeStyle = "#a855f7";
       ctx.lineWidth = 0.5;

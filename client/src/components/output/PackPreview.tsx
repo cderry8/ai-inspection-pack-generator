@@ -91,7 +91,7 @@ export default function PackPreview({
       </div>
 
       {error && (
-        <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 text-sm">
+        <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 text-sm text-center">
           {error}
         </div>
       )}

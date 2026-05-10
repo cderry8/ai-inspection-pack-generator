@@ -13,6 +13,22 @@ export async function generatePack(notes: string): Promise<PackData> {
   }
 }
 
+interface HistoryPack {
+  id: string;
+  title: string;
+  date: string;
+  risks: number;
+  highRisks: number;
+  missingDocuments: number;
+  actionItems: number;
+  status: string;
+}
+
+export async function getPacks(): Promise<HistoryPack[]> {
+  const response = await api.get("/aipg/packs");
+  return response.data.data;
+}
+
 export async function exportPack(packData: PackData): Promise<void> {
   try {
     const response = await api.post("/aipg/packs/export", { packData }, {

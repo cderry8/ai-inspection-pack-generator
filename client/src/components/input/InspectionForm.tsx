@@ -64,7 +64,7 @@ export default function InspectionForm({
         {onShowHistory && (
           <button
             onClick={onShowHistory}
-            className="w-full py-2.5 rounded-lg text-sm font-medium bg-slate-800/40 text-slate-400 border border-slate-700/50 hover:bg-slate-700/40 hover:text-cyan-300 hover:border-cyan-500/20 transition-all duration-200 flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-lg text-sm font-medium bg-slate-800/40 text-slate-400 border border-slate-700/50 hover:bg-slate-700/40 hover:text-cyan-300 hover:border-cyan-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -74,7 +74,7 @@ export default function InspectionForm({
         )}
 
         {(validationError || error) && (
-          <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 text-sm">
+          <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 text-sm text-center">
             {validationError || error}
           </div>
         )}
