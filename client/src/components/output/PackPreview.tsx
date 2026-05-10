@@ -5,34 +5,7 @@ import Button from "@/components/ui/button";
 import RiskSummary from "./risksummary";
 import MissingDocs from "./missingdocs";
 import ActionPlan from "./actionplan";
-
-interface Risk {
-  id: string;
-  title: string;
-  description: string;
-  confidence: "Low" | "Medium" | "High";
-}
-
-interface Document {
-  id: string;
-  name: string;
-  required: boolean;
-  category: string;
-}
-
-interface ActionItem {
-  id: string;
-  title: string;
-  priority: "Low" | "Medium" | "High";
-  assignee: string;
-  dueDays: number;
-}
-
-interface PackData {
-  risks: Risk[];
-  missingDocuments: Document[];
-  actionItems: ActionItem[];
-}
+import { PackData } from "@/types";
 
 interface PackPreviewProps {
   data: PackData;
