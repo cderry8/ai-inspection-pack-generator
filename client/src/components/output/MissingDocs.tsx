@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Card from "@/components/ui/Card";
+import Card from "@/components/ui/card";
 
 interface Document {
   id: string;
@@ -12,7 +11,6 @@ interface Document {
 
 interface MissingDocsProps {
   documents: Document[];
-  onToggleCheck: (id: string) => void;
 }
 
 const categoryColors: Record<string, string> = {
@@ -23,25 +21,7 @@ const categoryColors: Record<string, string> = {
   General: "bg-purple-500/20 text-purple-300 border-purple-500/30",
 };
 
-export default function MissingDocs({
-  documents,
-  onToggleCheck,
-}: MissingDocsProps) {
-  const [checkedDocs, setCheckedDocs] = useState<Set<string>>(new Set());
-
-  const handleToggle = (id: string) => {
-    const newChecked = new Set(checkedDocs);
-    if (newChecked.has(id)) {
-      newChecked.delete(id);
-    } else {
-      newChecked.add(id);
-    }
-    setCheckedDocs(newChecked);
-    onToggleCheck(id);
-  };
-
-  const checkedCount = checkedDocs.size;
-
+export default function MissingDocs({ documents }: MissingDocsProps) {
   return (
     <Card padding="lg" className="w-full">
       <div className="flex items-center justify-between mb-6">
@@ -62,34 +42,21 @@ export default function MissingDocs({
           Missing Documents
         </h3>
         <span className="text-sm text-slate-400">
-          {checkedCount}/{documents.length} checked
+          {documents.length} document{documents.length !== 1 ? "s" : ""}
         </span>
       </div>
 
       <div className="space-y-2">
         {documents.map((doc) => {
-          const isChecked = checkedDocs.has(doc.id);
           const categoryStyle = categoryColors[doc.category] || categoryColors.General;
 
           return (
-            <label
+            <div
               key={doc.id}
-              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200 ${
-                isChecked
-                  ? "bg-slate-800/60 border-purple-500/40"
-                  : "bg-slate-950/30 border-purple-500/20 hover:border-purple-500/30"
-              }`}
+              className="flex items-center gap-3 p-3 rounded-lg border bg-slate-950/30 border-purple-500/20"
             >
-              <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={() => handleToggle(doc.id)}
-                className="w-4 h-4 rounded border-purple-500/30 bg-slate-950 text-cyan-500 focus:ring-cyan-400/50"
-              />
               <div className="flex-1">
-                <span className={`${isChecked ? "line-through text-slate-500" : "text-white"}`}>
-                  {doc.name}
-                </span>
+                <span className="text-white">{doc.name}</span>
                 {doc.required && (
                   <span className="ml-2 text-xs text-rose-400">*Required</span>
                 )}
@@ -97,7 +64,7 @@ export default function MissingDocs({
               <span className={`px-2 py-0.5 rounded text-xs font-medium border ${categoryStyle}`}>
                 {doc.category}
               </span>
-            </label>
+            </div>
           );
         })}
       </div>

@@ -47,6 +47,17 @@ Return the response in strict JSON format with this structure:
   ]
 }`;
 
+function validateResponse(data) {
+  if (!data || typeof data !== "object") {
+    throw new Error("AI returned invalid data structure");
+  }
+  if (!Array.isArray(data.risks)) data.risks = [];
+  if (!Array.isArray(data.missingDocuments)) data.missingDocuments = [];
+  if (!Array.isArray(data.actionItems)) data.actionItems = [];
+  if (!data.summary) data.summary = "No summary available";
+  return data;
+}
+
 export async function generateInspectionPack(notes) {
   try {
     const response = await groq.chat.completions.create({
@@ -60,7 +71,8 @@ export async function generateInspectionPack(notes) {
     });
 
     const content = response.choices[0].message.content;
-    return JSON.parse(content);
+    const data = JSON.parse(content);
+    return validateResponse(data);
   } catch (error) {
     console.error("Error generating inspection pack:", error);
     throw new Error("Failed to generate inspection pack");

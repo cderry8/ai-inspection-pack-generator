@@ -1,40 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import InspectionForm from "@/components/input/InspectionForm";
-import PackPreview from "@/components/output/PackPreview";
-import Header from "@/components/layout/Header";
-import TopLoadingBar from "@/components/loading/TopLoadingBar";
-import { PackData } from "@/types";
-import { mockPackData } from "@/data/mockPackData";
+import InspectionForm from "@/components/input/inspectionform";
+import PackPreview from "@/components/output/packpreview";
+import Header from "@/components/layout/header";
+import TopLoadingBar from "@/components/loading/toploadingbar";
+import { useGeneratePack } from "@/hooks/usegeneratepack";
+import { PackData, Risk } from "@/types";
 
 export default function Home() {
+  const { packData, isLoading, error, generate, updatePackData, reset: resetPack } = useGeneratePack();
   const [hasGenerated, setHasGenerated] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [packData, setPackData] = useState(mockPackData);
 
   const handleGenerate = async (notes: string) => {
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setHasGenerated(true);
-    setIsLoading(false);
+    try {
+      await generate(notes);
+      setHasGenerated(true);
+    } catch (error) {
+      console.error("Failed to generate pack:", error);
+    }
   };
 
   const handleUpdateRiskConfidence = (id: string, confidence: "Low" | "Medium" | "High") => {
-    setPackData((prev) => ({
+    updatePackData((prev: PackData) => ({
       ...prev,
-      risks: prev.risks.map((risk) =>
+      risks: prev.risks.map((risk: Risk) =>
         risk.id === id ? { ...risk, confidence } : risk
       ),
     }));
   };
 
-  const handleToggleDocCheck = (id: string) => {};
-
   const handleExportPDF = () => {};
 
   const handleReset = () => {
     setHasGenerated(false);
+    resetPack();
   };
 
   return (
@@ -44,13 +44,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <Header />
           <div className="flex flex-col items-center">
-            {!hasGenerated ? (
-              <InspectionForm onGenerate={handleGenerate} isLoading={isLoading} />
+            {!hasGenerated || !packData ? (
+              <InspectionForm onGenerate={handleGenerate} isLoading={isLoading} error={error} />
             ) : (
               <PackPreview
                 data={packData}
                 onUpdateRiskConfidence={handleUpdateRiskConfidence}
-                onToggleDocCheck={handleToggleDocCheck}
                 onExportPDF={handleExportPDF}
                 onReset={handleReset}
               />

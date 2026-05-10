@@ -1,25 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@/components/ui/Button";
-import TextArea from "@/components/ui/TextArea";
-import Card from "@/components/ui/Card";
+import Button from "@/components/ui/button";
+import TextArea from "@/components/ui/textarea";
+import Card from "@/components/ui/card";
 
 interface InspectionFormProps {
   onGenerate: (notes: string) => void;
   isLoading?: boolean;
+  error?: string | null;
 }
+
+const MIN_NOTES_LENGTH = 50;
 
 export default function InspectionForm({
   onGenerate,
   isLoading = false,
+  error = null,
 }: InspectionFormProps) {
   const [notes, setNotes] = useState("");
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleSubmit = () => {
-    if (notes.trim()) {
-      onGenerate(notes);
+    setValidationError(null);
+
+    if (!notes.trim()) {
+      setValidationError("Please enter inspection notes");
+      return;
     }
+
+    if (notes.trim().length < MIN_NOTES_LENGTH) {
+      setValidationError(`Notes are too short. Please provide at least ${MIN_NOTES_LENGTH} characters with specific inspection details.`);
+      return;
+    }
+
+    onGenerate(notes);
   };
 
   return (
@@ -36,14 +51,23 @@ export default function InspectionForm({
 
         <TextArea
           value={notes}
-          onChange={setNotes}
+          onChange={(value) => {
+            setNotes(value);
+            setValidationError(null);
+          }}
           placeholder="Enter your inspection notes here... Example: Electrical wiring exposed in warehouse section B. Fire suppression system last checked 6 months ago. Missing safety training records for 3 employees..."
           rows={10}
         />
 
+        {(validationError || error) && (
+          <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 text-sm">
+            {validationError || error}
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <span className="text-xs text-slate-500">
-            {notes.length} characters
+            {notes.length} / min {MIN_NOTES_LENGTH} characters
           </span>
           <Button
             onClick={handleSubmit}

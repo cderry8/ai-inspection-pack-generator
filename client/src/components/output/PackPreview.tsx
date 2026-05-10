@@ -1,10 +1,10 @@
 "use client";
 
-import Card from "@/components/ui/Card";
-import Button from "@/components/ui/Button";
-import RiskSummary from "./RiskSummary";
-import MissingDocs from "./MissingDocs";
-import ActionPlan from "./ActionPlan";
+import Card from "@/components/ui/card";
+import Button from "@/components/ui/button";
+import RiskSummary from "./risksummary";
+import MissingDocs from "./missingdocs";
+import ActionPlan from "./actionplan";
 
 interface Risk {
   id: string;
@@ -37,7 +37,6 @@ interface PackData {
 interface PackPreviewProps {
   data: PackData;
   onUpdateRiskConfidence: (id: string, confidence: "Low" | "Medium" | "High") => void;
-  onToggleDocCheck: (id: string) => void;
   onExportPDF: () => void;
   onReset: () => void;
 }
@@ -45,7 +44,6 @@ interface PackPreviewProps {
 export default function PackPreview({
   data,
   onUpdateRiskConfidence,
-  onToggleDocCheck,
   onExportPDF,
   onReset,
 }: PackPreviewProps) {
@@ -83,10 +81,7 @@ export default function PackPreview({
             onUpdateConfidence={onUpdateRiskConfidence}
           />
         </div>
-        <MissingDocs
-          documents={data.missingDocuments}
-          onToggleCheck={onToggleDocCheck}
-        />
+        <MissingDocs documents={data.missingDocuments} />
         <ActionPlan actions={data.actionItems} />
       </div>
     </div>

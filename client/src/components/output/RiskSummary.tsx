@@ -1,7 +1,7 @@
 "use client";
 
-import Card from "@/components/ui/Card";
-import ConfidenceSelector from "@/components/ui/ConfidenceSelector";
+import Card from "@/components/ui/card";
+import ConfidenceSelector from "@/components/ui/confidenceselector";
 
 interface Risk {
   id: string;

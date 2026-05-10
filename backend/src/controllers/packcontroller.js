@@ -1,5 +1,23 @@
-import { generateInspectionPack } from "../services/aiAgent.js";
+import { generateInspectionPack } from "../services/aiagent.js";
 import { generatePDF } from "../services/pdfservice.js";
+
+const MIN_NOTES_LENGTH = 50;
+
+function validatePackData(data) {
+  if (!data || typeof data !== "object") {
+    return "AI response is not valid";
+  }
+  if (!Array.isArray(data.risks) || data.risks.length === 0) {
+    return "No risks identified. Please provide detailed inspection notes with specific hazards.";
+  }
+  if (!Array.isArray(data.missingDocuments) || data.missingDocuments.length === 0) {
+    return "No missing documents found. Please include document checks in your notes.";
+  }
+  if (!Array.isArray(data.actionItems) || data.actionItems.length === 0) {
+    return "No action items generated. Please provide specific issues to address.";
+  }
+  return null;
+}
 
 export async function createPack(req, res) {
   try {
@@ -11,7 +29,20 @@ export async function createPack(req, res) {
       });
     }
 
+    if (notes.trim().length < MIN_NOTES_LENGTH) {
+      return res.status(400).json({
+        error: `Notes are too short. Please provide at least ${MIN_NOTES_LENGTH} characters with specific inspection details.`,
+      });
+    }
+
     const packData = await generateInspectionPack(notes);
+
+    const validationError = validatePackData(packData);
+    if (validationError) {
+      return res.status(422).json({
+        error: validationError,
+      });
+    }
 
     res.status(200).json({
       success: true,
